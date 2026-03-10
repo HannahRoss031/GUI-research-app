@@ -6,8 +6,36 @@ import streamlit as st
 # TODO: pushing to git!
 #  git add .
 #  git commit -m "describe what you changed"
+# git pull origin main --allow-unrelated-histories
 #  git push
 
+# Sidebar UI
+st.markdown(
+    """
+    <style>
+        [data-testid="stSidebar"] {
+            background-color: #154734; 
+        }
+        [data-testid="stSidebar"] h1,
+        [data-testid="stSidebar"] h2,
+        [data-testid="stSidebar"] h3,
+        [data-testid="stSidebar"] p,
+        [data-testid="stSidebar"] div {
+            color: #F8F8F2 !important;
+        }
+        [data-testid="stSidebar"] a.st-emotion-cache-1qg05tj {
+            color: #F8F8F2 !important;      
+            border-color: #F8F8F2 !important;  
+            background-color: #F8F8F2 !important;
+        }
+        [data-testid="stSidebar"] .stSelectbox div[data-baseweb="select"] * {
+            color: #31333F !important;
+        }
+
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 
 st.write("Upload two gene coordinate files (BED format).")
 
