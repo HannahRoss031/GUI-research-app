@@ -26,13 +26,19 @@ with st.sidebar:
     st.text_input("Number of Threads", placeholder="default: SLURM_CPUS_PER_TASK or 1")
 
     # Details About Authors
-    st.text_input(" ") # spacer?
+    st.write(" ") # spacer?
     st.subheader("Created By: Dr. Mary Lauren Benton")
     st.write("Under the Benton Biomedical Lab: __(add link)__")
     st.subheader("Application Developer: Hannah Ross")
     st.write("Hannah Ross' Socials:")
-    st.link_button("Github","https://github.com/HannahRoss031")
-    st.link_button("LinkedIn", "https://www.linkedin.com/in/hannah-ross-06247a272/")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.link_button("Github", "https://github.com/HannahRoss031")
+
+    with col2:
+        st.link_button("LinkedIn", "https://www.linkedin.com/in/hannah-ross-06247a272/")
 
 # TODO: Add run button?
 
