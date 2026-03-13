@@ -7,7 +7,8 @@ import streamlit as st
 #  git add .
 #  git commit -m "describe what you changed"
 # git pull origin main --allow-unrelated-histories
-#  git push
+# Then if Vim opens again, press Escape then type :wq and hit Enter.
+# git push
 
 # Sidebar UI
 st.markdown(
@@ -30,6 +31,21 @@ st.markdown(
         }
         [data-testid="stSidebar"] .stSelectbox div[data-baseweb="select"] * {
             color: #31333F !important;
+        }
+        [data-testid="stSidebar"] button,
+        [data-testid="stSidebar"] a {
+            background-color: #2E7D57 !important;   /* light green */
+            color: #F8F8F2 !important;              /* off‑white text */
+            border: 1px solid #F8F8F2 !important;
+            border-radius: 6px !important;
+            padding: 0.5rem 1.2rem !important;      /* makes button wider */
+            width: 100% !important;                 /* full-width buttons */
+            text-align: center !important;
+        }
+        [data-testid="stSidebar"] button:hover,
+        [data-testid="stSidebar"] a:hover {
+            background-color: #246646 !important;   /* darker green */
+            color: #F8F8F2 !important;
         }
 
     </style>
@@ -55,11 +71,13 @@ with st.sidebar:
 
     # Details About Authors
     st.write(" ") # spacer?
-    st.subheader("Created By: Dr. Mary Lauren Benton")
+    st.subheader("Created By:")
+    st.subheader("Dr. Mary Lauren Benton")
     st.write("Under the Benton Biomedical Lab: __(add link)__")
-    st.subheader("Application Developer: Hannah Ross")
-    st.write("Hannah Ross' Socials:")
+    st.subheader("Application Developer:")
+    st.subheader("Hannah Ross")
 
+    st.write("Hannah Ross' Socials:")
     col1, col2 = st.columns(2)
 
     with col1:
@@ -68,7 +86,7 @@ with st.sidebar:
     with col2:
         st.link_button("LinkedIn", "https://www.linkedin.com/in/hannah-ross-06247a272/")
 
-# TODO: Add run button?
+    st.button("RUN") # add 'on-click' parameter
 
 # Upload files - BED
 file1 = st.file_uploader("Upload Condition A", type=["bed"])
