@@ -1,14 +1,15 @@
 import streamlit as st
+import comparisionFunction
 
-#FIXME: streamlit run myResearch.py
+# FIXME: streamlit run myResearch.py
 # C:\Users\hnros\PycharmProjects\researchTest
 
 # TODO: pushing to git!
 #  git add .
 #  git commit -m "describe what you changed"
-# git pull origin main --allow-unrelated-histories
-# Then if Vim opens again, press Escape then type :wq and hit Enter.
-# git push
+#  git pull origin main --allow-unrelated-histories
+#  Then if Vim opens again, press Escape then type :wq and hit Enter.
+#  git push
 
 # Sidebar UI
 st.markdown(
@@ -60,22 +61,22 @@ with st.sidebar:
     st.title("Gene Coordinate Comparison Demo")
     st.header("Calculate enrichment between two gene coordinates.")
 
+    st.button("RUN")  # add 'on-click' parameter
+
     # headers for each option
-    st.text_input("Percent Anno", placeholder="default: 1E -9")
-    st.text_input("Percent Test", placeholder="default: 1E-9")
-    st.text_input("Iterations", placeholder="default: 100")
-    st.selectbox("Species", ('hg19', 'hg38', 'mm10', 'dm3', 'dm6', 'sacCer3'),
+    annotation = st.text_input("Percent Anno", placeholder="default: 1E -9")
+    test = st.text_input("Percent Test", placeholder="default: 1E-9")
+    iterations = st.text_input("Iterations", placeholder="default: 100")
+    species = st.selectbox("Species", ('hg19', 'hg38', 'mm10', 'dm3', 'dm6', 'sacCer3'),
                  placeholder="default: hg19")
-    st.text_input("Blacklist", placeholder="default: None")
-    st.text_input("Number of Threads", placeholder="default: SLURM_CPUS_PER_TASK or 1")
+    blackListFile = st.text_input("Blacklist", placeholder="default: None")
+    threads = st.text_input("Number of Threads", placeholder="default: SLURM_CPUS_PER_TASK or 1")
 
     # Details About Authors
     st.write(" ") # spacer?
-    st.subheader("Created By:")
-    st.subheader("Dr. Mary Lauren Benton")
-    st.write("Under the Benton Biomedical Lab: __(add link)__")
-    st.subheader("Application Developer:")
-    st.subheader("Hannah Ross")
+    st.subheader("Created By: Dr. Mary Lauren Benton")
+    st.link_button("Benton Biomedical Lab", "https://cs.baylor.edu/~benton/")
+    st.subheader("Application Developer: Hannah Ross")
 
     st.write("Hannah Ross' Socials:")
     col1, col2 = st.columns(2)
@@ -86,12 +87,11 @@ with st.sidebar:
     with col2:
         st.link_button("LinkedIn", "https://www.linkedin.com/in/hannah-ross-06247a272/")
 
-    st.button("RUN") # add 'on-click' parameter
-
 # Upload files - BED
 file1 = st.file_uploader("Upload Condition A", type=["bed"])
 file2 = st.file_uploader("Upload Condition B", type=["bed"])
 
 # Files for the function
+
 
 # Output results into a readable table
