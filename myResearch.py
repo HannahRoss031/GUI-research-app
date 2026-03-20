@@ -115,7 +115,7 @@ file2 = st.file_uploader("Upload Condition B", type=["bed"])
 if st.button("Run"):
     st.write("RUNNING?...")
 
-    #if st.button("Run"):
+    #if st.button("Run"): #FIXME: test button again
      #   result = calculateExpected(
       #      annotation,
        #     test,
