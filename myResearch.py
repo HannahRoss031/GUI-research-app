@@ -1,6 +1,11 @@
 import streamlit as st
-import comparisionFunction
 
+#from main import calculateExpected
+
+# running from WSL -->
+# conda activate research
+# cd /mnt/c/Users/hnros/PycharmProjects/researchTest
+# pip install streamlit
 # FIXME: streamlit run myResearch.py
 # C:\Users\hnros\PycharmProjects\researchTest
 
@@ -11,6 +16,10 @@ import comparisionFunction
 #  Then if Vim opens again, press Escape then type :wq and hit Enter.
 #  git push
 
+# FIXME: conda activate research
+
+# TODO - printing details for files, and things selected probably,
+#  before printing from comparison function
 # Sidebar UI
 st.markdown(
     """
@@ -61,16 +70,27 @@ with st.sidebar:
     st.title("Gene Coordinate Comparison Demo")
     st.header("Calculate enrichment between two gene coordinates.")
 
-    st.button("RUN")  # add 'on-click' parameter
-
     # headers for each option
-    annotation = st.text_input("Percent Anno", placeholder="default: 1E -9")
-    test = st.text_input("Percent Test", placeholder="default: 1E-9")
-    iterations = st.text_input("Iterations", placeholder="default: 100")
+    annotation = st.text_input("Percent Anno",
+                               value = 1e-9,
+                               placeholder="default: 1E -9")
+    pTest = st.text_input("Percent Test",
+                          value = 1e-9,
+                          placeholder="default: 1E-9")
+    iterations = st.text_input("Iterations",
+                               value = 100,
+                               placeholder="default: 100")
     species = st.selectbox("Species", ('hg19', 'hg38', 'mm10', 'dm3', 'dm6', 'sacCer3'),
-                 placeholder="default: hg19")
-    blackListFile = st.text_input("Blacklist", placeholder="default: None")
-    threads = st.text_input("Number of Threads", placeholder="default: SLURM_CPUS_PER_TASK or 1")
+                            value = 'hg19',
+                            placeholder="default: hg19")
+    blackListFile = st.text_input("Blacklist",
+                                  value = "",
+                                  placeholder="default: None")
+    threads = st.text_input("Number of Threads",
+                            value = 0,
+                            placeholder="default: SLURM_CPUS_PER_TASK or 1")
+
+    # FIXME : ensure all the arguments are added!
 
     # Details About Authors
     st.write(" ") # spacer?
@@ -91,7 +111,25 @@ with st.sidebar:
 file1 = st.file_uploader("Upload Condition A", type=["bed"])
 file2 = st.file_uploader("Upload Condition B", type=["bed"])
 
-# Files for the function
+# Embed the Function
+if st.button("Run"):
+    st.write("RUNNING?...")
 
+    #if st.button("Run"):
+     #   result = calculateExpected(
+      #      annotation,
+       #     test,
+            #percent_overlap,
+            #elementwise,
+            #hapblock,
+        #    species,
+            #custom,
+            #strand,
+         #   iterations
+        #)
 
-# Output results into a readable table
+    # Output results into a readable table
+    with st.spinner("Calculating enrichment..."):
+        pass
+        #result = subprocess.run(command, capture_output=True, text=True)
+        #st.text(result.stdout)  # This shows whatever your other script printed

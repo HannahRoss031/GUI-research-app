@@ -28,6 +28,7 @@ from functools import partial
 from multiprocessing import Pool
 from pybedtools import BedTool
 from pybedtools.helpers import BEDToolsError, cleanup, get_tempdir, set_tempdir
+import myResearch
 
 # FIXME: have to run directly from terminal!
 #  source ~/bioenv/bin/activate
@@ -73,7 +74,7 @@ arg_parser.add_argument("--by_hap_block", action='store_true', default=False,
 
 args = arg_parser.parse_args()
 
-# save parameters
+# save parameters FIXME - saving directly from input, without the parser?
 ANNOTATION_FILENAME = args.region_file_1
 TEST_FILENAME = args.region_file_2
 PERCENT_A = args.percent_anno
@@ -94,7 +95,6 @@ else:
 
 # if running on slurm, set tmp to runtime dir
 set_tempdir(os.getenv('ACCRE_RUNTIME_DIR', get_tempdir()))
-
 
 ###
 #   functions
