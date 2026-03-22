@@ -1,6 +1,6 @@
 import streamlit as st
 
-#from main import calculateExpected
+from main import calculateExpected, calculateObserved
 
 # running from WSL -->
 # conda activate research
@@ -71,7 +71,7 @@ with st.sidebar:
     st.header("Calculate enrichment between two gene coordinates.")
 
     # headers for each option
-    annotation = st.text_input("Percent Anno",
+    pAnno = st.text_input("Percent Anno",
                                value = 1e-9,
                                placeholder="default: 1E -9")
     pTest = st.text_input("Percent Test",
@@ -89,7 +89,11 @@ with st.sidebar:
     threads = st.text_input("Number of Threads",
                             value = 0,
                             placeholder="default: SLURM_CPUS_PER_TASK or 1")
-
+    percent_overlap = 0
+    elementwise = 0
+    hapblock = 0
+    strand = 0
+    # FIXME: change arguments to match the file! I am confused lol 
     # FIXME : ensure all the arguments are added!
 
     # Details About Authors
@@ -108,25 +112,22 @@ with st.sidebar:
         st.link_button("LinkedIn", "https://www.linkedin.com/in/hannah-ross-06247a272/")
 
 # Upload files - BED
-file1 = st.file_uploader("Upload Condition A", type=["bed"])
-file2 = st.file_uploader("Upload Condition B", type=["bed"])
+annotation = st.file_uploader("Upload Condition A", type=["bed"])
+test = st.file_uploader("Upload Condition B", type=["bed"])
 
 # Embed the Function
 if st.button("Run"):
     st.write("RUNNING?...")
 
-    #if st.button("Run"): #FIXME: test button again
-     #   result = calculateExpected(
-      #      annotation,
-       #     test,
-            #percent_overlap,
-            #elementwise,
-            #hapblock,
-        #    species,
-            #custom,
-            #strand,
-         #   iterations
-        #)
+    if st.button("Run"): #FIXME: test button again
+        observed = calculateObserved(
+            annotation,
+            test,
+            percent_overlap,
+            elementwise,
+            hapblock,
+            strand
+        )
 
     # Output results into a readable table
     with st.spinner("Calculating enrichment..."):
