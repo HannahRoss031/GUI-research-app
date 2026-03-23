@@ -81,7 +81,6 @@ with st.sidebar:
                                value = 100,
                                placeholder="default: 100")
     species = st.selectbox("Species", ('hg19', 'hg38', 'mm10', 'dm3', 'dm6', 'sacCer3'),
-                            value = 'hg19',
                             placeholder="default: hg19")
     blackListFile = st.text_input("Blacklist",
                                   value = "",
@@ -89,11 +88,14 @@ with st.sidebar:
     threads = st.text_input("Number of Threads",
                             value = 0,
                             placeholder="default: SLURM_CPUS_PER_TASK or 1")
+    elementwise = st.checkbox("Elementwise", value=False)
+
+    hapblock = st.checkbox("Haplotype Block", value=False)
+
+    strand = st.checkbox("Strand-Specific", value=False)
+
     percent_overlap = 0
-    elementwise = 0
-    hapblock = 0
-    strand = 0
-    # FIXME: change arguments to match the file! I am confused lol 
+    # FIXME: change arguments to match the file! I am confused lol
     # FIXME : ensure all the arguments are added!
 
     # Details About Authors
@@ -119,15 +121,15 @@ test = st.file_uploader("Upload Condition B", type=["bed"])
 if st.button("Run"):
     st.write("RUNNING?...")
 
-    if st.button("Run"): #FIXME: test button again
-        observed = calculateObserved(
-            annotation,
-            test,
-            percent_overlap,
-            elementwise,
-            hapblock,
-            strand
-        )
+    #if st.button("Run"): #FIXME: test button again
+        #observed = calculateObserved(
+        #    annotation,
+        #    test,
+        #    percent_overlap,
+        #    elementwise,
+        #    hapblock,
+        #    strand
+        #)
 
     # Output results into a readable table
     with st.spinner("Calculating enrichment..."):

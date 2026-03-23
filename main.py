@@ -21,14 +21,13 @@
 
 import os
 import sys, traceback
-import argparse
+#import argparse
 import datetime
 import numpy as np
 from functools import partial
 from multiprocessing import Pool
 from pybedtools import BedTool
 from pybedtools.helpers import BEDToolsError, cleanup, get_tempdir, set_tempdir
-import myResearch
 
 # FIXME: have to run directly from terminal!
 #  source ~/bioenv/bin/activate
@@ -37,6 +36,7 @@ import myResearch
 ###
 #   arguments
 ###
+"""
 arg_parser = argparse.ArgumentParser(description="Calculate enrichment between bed files.")
 
 arg_parser.add_argument("region_file_1", help='bed file 1 (shuffled)')
@@ -95,6 +95,7 @@ else:
 
 # if running on slurm, set tmp to runtime dir
 set_tempdir(os.getenv('ACCRE_RUNTIME_DIR', get_tempdir()))
+"""
 
 ###
 #   functions
