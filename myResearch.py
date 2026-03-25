@@ -1,6 +1,6 @@
 import streamlit as st
 
-from main import calculateExpected, calculateObserved
+from main import main
 
 # running from WSL -->
 # conda activate research
@@ -120,16 +120,7 @@ test = st.file_uploader("Upload Condition B", type=["bed"])
 # Embed the Function
 if st.button("Run", key = "runButton"):
     st.write("RUNNING?...")
-
-    if st.button("Run"): #FIXME: test button again
-        observed = calculateObserved(
-            annotation,
-            test,
-            percent_overlap,
-            elementwise,
-            hapblock,
-            strand
-        )
+    main(annotation, test, pAnno, pTest,elementwise, hapblock, species, blackListFile, strand, threads, iterations)
 
     # Output results into a readable table
     with st.spinner("Calculating enrichment..."):

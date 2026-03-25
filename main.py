@@ -175,6 +175,7 @@ def calculateEmpiricalP(obs, exp_sum_list):
 ###
 #   main
 ###
+'''
 def main(argv):
     # print header
     print('python {:s} {:s}'.format(' '.join(sys.argv), str(datetime.datetime.now())[:20]))
@@ -211,7 +212,46 @@ def main(argv):
 
     # clean up any pybedtools tmp files
     cleanup()
+'''
 
+def main(annotation, test, pAnno, pTest,elementwise, hapblock, species, blackListFile, strand, threads, iterations):
+    # print header
+    print('python {:s} {:s}'.format(' '.join(sys.argv), str(datetime.datetime.now())[:20]))
+    print('Observed\tExpected\tStdDev\tFoldChange\tp-value')
+
+    # run initial intersection and save
+    obs_sum = calculateObserved(BedTool(annotation), BedTool(test), (pAnno, pTest),
+                                elementwise, hapblock, strand)
+
+    # create pool and run simulations in parallel
+    pool = Pool(threads)
+    partial_calcExp = partial(calculateExpected, BedTool(annotation), BedTool(test), (pAnno, pTest),
+                              elementwise, hapblock, species, blackListFile, strand)
+    exp_sum_list = pool.map(partial_calcExp, [i for i in range(iterations)])
+
+    # wait for results to finish before calculating p-value
+    pool.close()
+    pool.join()
+
+    # remove iterations that throw bedtools exceptions
+    final_exp_sum_list = [x for x in exp_sum_list if x >= 0]
+    exceptions = exp_sum_list.count(-999)
+
+    # calculate empirical p value
+    if exceptions / iterations <= .1:
+        print(calculateEmpiricalP(obs_sum, final_exp_sum_list))
+        print(f'iterations not completed: {exceptions}', file=sys.stderr)
+    else:
+        print(f'iterations not completed: {exceptions}\nresulted in nonzero exit status', file=sys.stderr)
+        cleanup()
+        sys.exit(1)
+
+    if test is not None:
+        with open(test, "w") as count_file:
+            count_file.write('{}\n{}\n'.format(obs_sum, '\t'.join(map(str, exp_sum_list))))
+
+    # clean up any pybedtools tmp files
+    cleanup()
 
 if __name__ == "__main__":
     main(sys.argv[1:])
