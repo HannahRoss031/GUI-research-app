@@ -95,8 +95,8 @@ with st.sidebar:
     strand = st.checkbox("Strand-Specific", value=False)
 
     percent_overlap = 0
-    # FIXME: change arguments to match the file! I am confused lol
-    # FIXME : ensure all the arguments are added!
+    # FIXME: change arguments to match the file
+    # FIXME : ensure all the arguments are added
 
     # Details About Authors
     st.write(" ") # spacer?
@@ -118,18 +118,18 @@ annotation = st.file_uploader("Upload Condition A", type=["bed"])
 test = st.file_uploader("Upload Condition B", type=["bed"])
 
 # Embed the Function
-if st.button("Run"):
+if st.button("Run", key = "runButton"):
     st.write("RUNNING?...")
 
-    #if st.button("Run"): #FIXME: test button again
-        #observed = calculateObserved(
-        #    annotation,
-        #    test,
-        #    percent_overlap,
-        #    elementwise,
-        #    hapblock,
-        #    strand
-        #)
+    if st.button("Run"): #FIXME: test button again
+        observed = calculateObserved(
+            annotation,
+            test,
+            percent_overlap,
+            elementwise,
+            hapblock,
+            strand
+        )
 
     # Output results into a readable table
     with st.spinner("Calculating enrichment..."):
