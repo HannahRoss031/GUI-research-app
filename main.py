@@ -224,7 +224,8 @@ def main(annotation, test, pAnno, pTest,elementwise, hapblock, species, blackLis
                                 elementwise, hapblock, strand)
 
     # create pool and run simulations in parallel
-    pool = Pool(threads)
+    #pool = Pool(threads) FIXME - edit for something else?
+    pool = Pool(int(threads) if threads and int(threads) > 0 else 1)
     partial_calcExp = partial(calculateExpected, BedTool(annotation), BedTool(test), (pAnno, pTest),
                               elementwise, hapblock, species, blackListFile, strand)
     exp_sum_list = pool.map(partial_calcExp, [i for i in range(iterations)])
