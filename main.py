@@ -262,11 +262,12 @@ def main(annotation, test, pAnno, pTest, elementwise, hapblock, species, blackLi
     # remove iterations that throw bedtools exceptions
     final_exp_sum_list = [x for x in exp_sum_list if x >= 0]
     exceptions = exp_sum_list.count(-999)
-    print("Exceptions: {0:d}".format(exceptions))
+    #print("Exceptions: {0:d}".format(exceptions))
     # calculate empirical p value
     if exceptions / iterations <= .1:
-        print(calculateEmpiricalP(obs_sum, final_exp_sum_list))
-        print(f'iterations not completed: {exceptions}', file=sys.stderr)
+        result = (calculateEmpiricalP(obs_sum, final_exp_sum_list))
+        #result2 = (f'iterations not completed: {exceptions}', file=sys.stderr)
+        result2 = f'iterations not completed: {exceptions}'
     else:
         print(f'iterations not completed: {exceptions}\nresulted in nonzero exit status', file=sys.stderr)
         cleanup()
@@ -278,6 +279,8 @@ def main(annotation, test, pAnno, pTest, elementwise, hapblock, species, blackLi
 
     # clean up any pybedtools tmp files
     cleanup()
+
+    return result, result2
 
 if __name__ == "__main__":
     pass

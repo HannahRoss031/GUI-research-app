@@ -2,6 +2,7 @@ import os
 import tempfile
 import traceback
 
+import pandas as pd
 import streamlit as st
 from pybedtools import BedTool
 from main import main
@@ -27,7 +28,6 @@ from main import main
 
 def run_analysis():
     try:
-        print("DEBUG blackListFile =", blackListFile, type(blackListFile))
         return main(annotation_path, test_path, pAnno, pTest,
                     elementwise, hapblock, species, blackListFile,
                     strand, threads, iterations)
@@ -160,14 +160,16 @@ if annotation and test: # edit to make sure files are correct
 
 # FIXME: runs, but the values are incorrect
 
-
 if st.button("Run", key = "runButton"):
-    st.write("RUNNING?...")
     result = run_analysis()
-    st.write("Done.")
 
-    # TODO: include a write for an instance where there are no iterations.
-    # will print nothing anyways?
+    # Table for Results:
+    headers = ['Observed', 'Expected', 'StdDev', 'FoldChange', 'p-value']
+    values = result[0].split('\t')
+
+    data = pd.DataFrame([values], columns=headers)
+    st.table(data)
+    st.caption(result[1])  # 'iterations not completed: 0'
 
     # cleanup temp files after
     os.unlink(annotation_path)
