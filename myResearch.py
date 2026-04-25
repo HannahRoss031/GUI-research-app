@@ -1,5 +1,7 @@
 import os
 import tempfile
+import traceback
+
 import streamlit as st
 from pybedtools import BedTool
 from main import main
@@ -22,6 +24,17 @@ from main import main
 
 # TODO - printing details for files, and things selected probably,
 #  before printing from comparison function
+
+def run_analysis():
+    try:
+        print("DEBUG blackListFile =", blackListFile, type(blackListFile))
+        return main(annotation_path, test_path, pAnno, pTest,
+                    elementwise, hapblock, species, blackListFile,
+                    strand, threads, iterations)
+    except Exception:
+        traceback.print_exc()
+        raise
+
 # Sidebar UI
 st.markdown(
     """
@@ -92,10 +105,12 @@ with st.sidebar:
                             placeholder="default: hg19")
     species = species if species is not None else "hg19"
 
-    blackListFile = st.text_input("Blacklist",
-                                  value = "",
-                                  placeholder="default: None")
-    blackListFile = blackListFile if blackListFile is not None else ""
+    blackListFile_file = st.file_uploader("Blacklist File")
+
+    if blackListFile_file is None:
+        blackListFile = "none"  # or whatever your pipeline expects
+    else:
+        blackListFile = blackListFile_file.name  # or ignore it entirely
 
     threads = st.text_input("Number of Threads",
                             value = None,
@@ -143,17 +158,17 @@ if annotation and test: # edit to make sure files are correct
     annotation_bed = BedTool(annotation_path)
     test_bed = BedTool(test_path)
 
-# Embed the Function
+# FIXME: runs, but the values are incorrect
+
+
 if st.button("Run", key = "runButton"):
     st.write("RUNNING?...")
-    main(annotation_path, test_path, pAnno, pTest,elementwise, hapblock, species, blackListFile, strand, threads, iterations)
+    result = run_analysis()
+    st.write("Done.")
+
+    # TODO: include a write for an instance where there are no iterations.
+    # will print nothing anyways?
 
     # cleanup temp files after
     os.unlink(annotation_path)
     os.unlink(test_path)
-# FIXME: does not recognize the file types? formatting issue?
-    # Output results into a readable table
-    with st.spinner("Calculating enrichment..."):
-        pass
-        #result = subprocess.run(command, capture_output=True, text=True)
-        #st.text(result.stdout)  # This shows whatever your other script printed

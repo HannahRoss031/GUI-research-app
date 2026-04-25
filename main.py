@@ -20,12 +20,14 @@
 ###
 
 import os
+import pickle
 import sys, traceback
 #import argparse
 import datetime
 import numpy as np
 from functools import partial
 from multiprocessing import Pool
+import pybedtools
 from pybedtools import BedTool
 from pybedtools.helpers import BEDToolsError, cleanup, get_tempdir, set_tempdir
 
@@ -129,27 +131,31 @@ def calculateObserved(annotation, test, percent_overlap, elementwise, hapblock, 
     return obs_sum
 
 
-def calculateExpected(annotation, test, percent_overlap, elementwise, hapblock, species, custom, strand, iters):
+def calculateExpected(annotation, test, percent_overlap, elementwise, hapblock, species, custom, strand, iterations, iteration_index):
     BLACKLIST = loadConstants(species, custom)
     exp_sum = 0
 
+
     try:
+        anno_bt = BedTool(annotation) # additions?
+        test_bt = BedTool(test)
         if BLACKLIST is not None:
-            rand_file = annotation.shuffle(genome=species, excl=BLACKLIST, chrom=True, noOverlapping=True)
+            rand_file = anno_bt.shuffle(genome=species, excl=BLACKLIST, chrom=True, noOverlapping=True)
         else:
-            rand_file = annotation.shuffle(genome=species, chrom=True, noOverlapping=True)
+            rand_file = anno_bt.shuffle(genome=species, chrom=True, noOverlapping=True)
 
         if elementwise:
-            exp_sum = rand_file.intersect(test, u=True, s=strand, f=percent_overlap[0], F=percent_overlap[1]).count()
+            exp_sum = rand_file.intersect(test_bt, u=True, s=strand, f=percent_overlap[0], F=percent_overlap[1]).count()
         else:
-            exp_intersect = rand_file.intersect(test, s=strand, wo=True, f=percent_overlap[0], F=percent_overlap[1])
+            exp_intersect = rand_file.intersect(test_bt, s=strand, wo=True, f=percent_overlap[0], F=percent_overlap[1])
 
             if hapblock:
                 exp_sum = len(set(x[-2] for x in exp_intersect))
             else:
                 for line in exp_intersect:
                     exp_sum += int(line[-1])
-    except BEDToolsError:
+    except BEDToolsError as e:
+        print("Worker error:", repr(e))
         exp_sum = -999
 
     return exp_sum
@@ -214,7 +220,10 @@ def main(argv):
     cleanup()
 '''
 
-def main(annotation, test, pAnno, pTest,elementwise, hapblock, species, blackListFile, strand, threads, iterations):
+def main(annotation, test, pAnno, pTest, elementwise, hapblock, species, blackListFile, strand, threads, iterations):
+
+    print("-------------------------NEW RUN-------------------------")
+
     # print header
     print('python {:s} {:s}'.format(' '.join(sys.argv), str(datetime.datetime.now())[:20]))
     print('Observed\tExpected\tStdDev\tFoldChange\tp-value')
@@ -224,10 +233,26 @@ def main(annotation, test, pAnno, pTest,elementwise, hapblock, species, blackLis
                                 elementwise, hapblock, strand)
 
     # create pool and run simulations in parallel
-    #pool = Pool(threads) FIXME - edit for something else?
+    #pool = Pool(threads)
     pool = Pool(int(threads) if threads and int(threads) > 0 else 1)
-    partial_calcExp = partial(calculateExpected, BedTool(annotation), BedTool(test), (pAnno, pTest),
-                              elementwise, hapblock, species, blackListFile, strand)
+   # partial_calcExp = partial(calculateExpected, BedTool(annotation), BedTool(test), (pAnno, pTest),
+   #                           elementwise, hapblock, species, blackListFile, strand)
+
+    cs = pybedtools.chromsizes(species) # to account for dictionary of species in pybedtools
+
+    partial_calcExp = partial(
+        calculateExpected,
+        annotation, test,
+        (pAnno, pTest),
+        elementwise,
+        hapblock,
+        cs,
+        blackListFile,
+        strand,
+        iterations
+        # iteration_index is supplied by pool.map
+    )
+
     exp_sum_list = pool.map(partial_calcExp, [i for i in range(iterations)])
 
     # wait for results to finish before calculating p-value
@@ -237,7 +262,7 @@ def main(annotation, test, pAnno, pTest,elementwise, hapblock, species, blackLis
     # remove iterations that throw bedtools exceptions
     final_exp_sum_list = [x for x in exp_sum_list if x >= 0]
     exceptions = exp_sum_list.count(-999)
-
+    print("Exceptions: {0:d}".format(exceptions))
     # calculate empirical p value
     if exceptions / iterations <= .1:
         print(calculateEmpiricalP(obs_sum, final_exp_sum_list))
@@ -255,4 +280,4 @@ def main(annotation, test, pAnno, pTest,elementwise, hapblock, species, blackLis
     cleanup()
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    pass
