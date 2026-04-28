@@ -78,6 +78,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+print(">>>>>>>>>>>>>>very top")
 st.write("Upload two gene coordinate files (BED format).")
 
 # Create sidebar? - holding various options
@@ -127,6 +128,8 @@ with st.sidebar:
     # FIXME: change arguments to match the file
     # FIXME : ensure all the arguments are added
 
+    print(">>>>>>>>>>>>>>after variables ")
+
     # Details About Authors
     st.write(" ") # spacer?
     st.subheader("Created By: Dr. Mary Lauren Benton")
@@ -141,6 +144,8 @@ with st.sidebar:
 
     with col2:
         st.link_button("LinkedIn", "https://www.linkedin.com/in/hannah-ross-06247a272/")
+
+print(">>>>>>>>>>>>>>before files")
 
 # Upload files - BED
 annotation = st.file_uploader("Upload Condition A", type=["bed"])
@@ -160,7 +165,10 @@ if annotation and test: # edit to make sure files are correct
 
 # FIXME: runs, but the values are incorrect
 
+print(">>>>>>>>>>>>>>right before running")
+
 if st.button("Run", key = "runButton"):
+    print("HELLOOOO")
     result = run_analysis()
 
     # Table for Results:

@@ -1,0 +1,105 @@
+###
+#   arguments
+###
+"""
+arg_parser = argparse.ArgumentParser(description="Calculate enrichment between bed files.")
+
+arg_parser.add_argument("region_file_1", help='bed file 1 (shuffled)')
+arg_parser.add_argument("region_file_2", help='bed file 2 (not shuffled)')
+
+arg_parser.add_argument("-a", "--percent_anno", type=float, default=1E-9,
+                        help='min overlap required as a fraction of first file; default=1E-9 or 1bp')
+
+arg_parser.add_argument("-t", "--percent_test", type=float, default=1E-9,
+                        help='min overlap required as a fraction of second file; default=1E-9 or 1bp')
+
+arg_parser.add_argument("-i", "--iters", type=int, default=100,
+                        help='number of simulation iterations; default=100')
+
+arg_parser.add_argument("-s", "--species", type=str, default='hg19', choices=['hg19', 'hg38', 'mm10', 'dm3', 'dm6', 'sacCer3'],
+                        help='species and assembly; default=hg19')
+
+arg_parser.add_argument("-b", "--blacklist", type=str, default=None,
+                        help='custom blacklist file; default=None')
+
+arg_parser.add_argument("-n", "--num_threads", type=int,
+                        help='number of threads; default=SLURM_CPUS_PER_TASK or 1')
+
+arg_parser.add_argument("--print_counts_to", type=str, default=None,
+                        help="print expected counts to file")
+
+arg_parser.add_argument("--stranded", action='store_true', default=False,
+                        help='only count overlaps with matching strand; default=False')
+
+arg_parser.add_argument("--elem_wise", action='store_true', default=False,
+                        help='perform element-wise overlaps; default=False')
+
+arg_parser.add_argument("--by_hap_block", action='store_true', default=False,
+                        help='perform haplotype-block overlaps; default=False')
+
+args = arg_parser.parse_args()
+
+# save parameters FIXME - saving directly from input, without the parser?
+ANNOTATION_FILENAME = args.region_file_1
+TEST_FILENAME = args.region_file_2
+PERCENT_A = args.percent_anno
+PERCENT_B = args.percent_test
+COUNT_FILENAME = args.print_counts_to
+ITERATIONS = args.iters
+SPECIES = args.species
+ELEMENT = args.elem_wise
+HAPBLOCK = args.by_hap_block
+STRAND = args.stranded
+CUSTOM_BLIST = args.blacklist
+
+# calculate the number of threads
+if args.num_threads:
+    num_threads = args.num_threads
+else:
+    num_threads = int(os.getenv('SLURM_CPUS_PER_TASK', 1))
+
+# if running on slurm, set tmp to runtime dir
+set_tempdir(os.getenv('ACCRE_RUNTIME_DIR', get_tempdir()))
+"""
+
+###
+#   main
+###
+'''
+def main(argv):
+    # print header
+    print('python {:s} {:s}'.format(' '.join(sys.argv), str(datetime.datetime.now())[:20]))
+    print('Observed\tExpected\tStdDev\tFoldChange\tp-value')
+
+    # run initial intersection and save
+    obs_sum = calculateObserved(BedTool(ANNOTATION_FILENAME), BedTool(TEST_FILENAME), (PERCENT_A, PERCENT_B), ELEMENT, HAPBLOCK, STRAND)
+
+    # create pool and run simulations in parallel
+    pool = Pool(num_threads)
+    partial_calcExp = partial(calculateExpected, BedTool(ANNOTATION_FILENAME), BedTool(TEST_FILENAME), (PERCENT_A, PERCENT_B), ELEMENT, HAPBLOCK, SPECIES, CUSTOM_BLIST, STRAND)
+    exp_sum_list = pool.map(partial_calcExp, [i for i in range(ITERATIONS)])
+
+    # wait for results to finish before calculating p-value
+    pool.close()
+    pool.join()
+
+    # remove iterations that throw bedtools exceptions
+    final_exp_sum_list = [x for x in exp_sum_list if x >= 0]
+    exceptions = exp_sum_list.count(-999)
+
+    # calculate empirical p value
+    if exceptions / ITERATIONS <= .1:
+        print(calculateEmpiricalP(obs_sum, final_exp_sum_list))
+        print(f'iterations not completed: {exceptions}', file=sys.stderr)
+    else:
+        print(f'iterations not completed: {exceptions}\nresulted in nonzero exit status', file=sys.stderr)
+        cleanup()
+        sys.exit(1)
+
+    if COUNT_FILENAME is not None:
+        with open(COUNT_FILENAME, "w") as count_file:
+            count_file.write('{}\n{}\n'.format(obs_sum, '\t'.join(map(str, exp_sum_list))))
+
+    # clean up any pybedtools tmp files
+    cleanup()
+'''
